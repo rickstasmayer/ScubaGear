@@ -25,6 +25,7 @@ TestPlan:
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
+              ErrorAction: Continue
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Enabled, Strict EOP Disabled
@@ -33,6 +34,7 @@ TestPlan:
             Splat:
               Identity: Standard Preset Security Policy
               Confirm: false
+              ErrorAction: Continue
           - Command: Disable-EOPProtectionPolicyRule
             Splat:
               Identity: Strict Preset Security Policy
@@ -45,32 +47,58 @@ TestPlan:
             Splat:
               Identity: Standard Preset Security Policy
               Confirm: false
+              ErrorAction: Continue
           - Command: Enable-EOPProtectionPolicyRule
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
+              ErrorAction: Continue
         Postconditions: []
         ExpectedResult: true
 
   - PolicyId: MS.DEFENDER.1.3v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.DEFENDER.1.3v1 Non-compliant - No defender license
+      - TestDescription: MS.DEFENDER.1.3v1 Non-compliant - No Defender for O365 license
         Preconditions: []
         Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.DEFENDER.1.5v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.DEFENDER.1.5v1 Non-compliant - No defender license
+      - TestDescription: MS.DEFENDER.1.5v1 Non-compliant - No Defender for O365 license
         Preconditions: []
         Postconditions: []
         ExpectedResult: false
+
+  - PolicyId: MS.DEFENDER.2.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.1v1 Non-compliant - No Defender for O365 license
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.DEFENDER.2.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - No Defender for O365 license
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.DEFENDER.2.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.3v1 Non-compliant - No Defender for O365 license
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+
   - PolicyId: MS.DEFENDER.3.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.DEFENDER.3.1v1 Non-compliant - No defender license
+      - TestDescription: MS.DEFENDER.3.1v1 Non-compliant - No Defender for O365 license
         Preconditions: []
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false

@@ -120,7 +120,7 @@ function Get-EXOTenantDetail {
             $TenantId = (ConvertFrom-Json $Content).token_endpoint.Split("/")[3]
         }
         catch {
-            Write-Warning "Unable to retrieve EXO Tenant ID with URI. This may be caused by proxy error see 'Running the Script Behind Some Proxies' in the README for a solution. $($_)"
+            Write-Warning "Unable to retrieve EXO Tenant ID with URI. This may be caused by proxy error see 'Running the Script Behind Some Proxies' in the README for a solution: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         }
 
         $EXOTenantInfo = @{
@@ -133,7 +133,7 @@ function Get-EXOTenantDetail {
         $EXOTenantInfo
     }
     catch {
-        Write-Warning "Error retrieving Tenant details using Get-EXOTenantDetail $($_)"
+        Write-Warning "Error retrieving Tenant details using Get-EXOTenantDetail: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         $EXOTenantInfo = @{
             "DisplayName" = "Error retrieving Display name";
             "DomainName" = "Error retrieving Domain name";
@@ -388,7 +388,6 @@ function Get-ScubaSpfRecord {
     if ($NLowConf -gt 0) {
         Write-Warning "Get-ScubaSpfRecord: for $($NLowConf) domain(s), the tradtional DNS queries returned an empty answer section and the DoH queries failed. Will assume SPF not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'spf_records' for more details."
     }
-    $DnsLog += $Response.LogEntries
     $SPFRecords
 }
 

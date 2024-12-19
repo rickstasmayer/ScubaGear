@@ -1,24 +1,35 @@
-# Helper functions for functional test
-function FromInnerHtml{
-    <#
-    .SYNOPSIS
-      Private helper function to convert Inner HTML values format to match expected values format
-  #>
-    param(
-        [Parameter(Mandatory = $true, ValueFromPipeline=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $InnerHtml
-    )
-    process{
-        #$NewLine = [System.Environment]::NewLine
-        $OutString = $InnerHtml -Replace '<br>', '<br/>'
-        $OutString = $OutString -Replace "<a href=""", "<a href='"
-        $OutString = $OutString -Replace """>", "'>"
-        $OutString
-    }
-}
+$UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Utility/Utility.psm1" -Resolve
+Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom
 
+# Helper functions for functional test
+function IsEquivalence{
+  <#
+  .SYNOPSIS
+    Private helper function to compare two string for functional equivalence
+#>
+  param(
+      [Parameter(Mandatory = $true)]
+      [ValidateNotNullOrEmpty()]
+      [string]
+      $First,
+      [Parameter(Mandatory = $true)]
+      [ValidateNotNullOrEmpty()]
+      [string]
+      $Second
+  )
+  process{
+    $First = $First -Replace '<br>', '<br/>'
+    $First = $First -Replace '&amp;', '&'
+    Write-Debug " First: $First"
+    Write-Debug "Second: $Second"
+    0 -eq [String]::Compare(
+      $First,
+      $Second,
+      [System.Globalization.CultureInfo]::InvariantCulture,
+      [System.Globalization.CompareOptions]::IgnoreSymbols
+    )
+  }
+}
 function Set-NestedMemberValue {
   <#
     .SYNOPSIS
@@ -82,7 +93,8 @@ function LoadProviderExport() {
       Copy-Item -Path "$OutputFolder/ProviderSettingsExport.json" -Destination "$OutputFolder/ModifiedProviderSettingsExport.json"
   }
 
-  $ProviderExport = Get-Content -Raw "$OutputFolder/ModifiedProviderSettingsExport.json" | ConvertFrom-Json
+  $Content = Get-Utf8NoBom -FilePath "$OutputFolder/ModifiedProviderSettingsExport.json"
+  $ProviderExport = $Content | ConvertFrom-Json
   $ProviderExport
 }
 
@@ -118,7 +130,7 @@ function PublishProviderExport() {
       $Export
   )
   $Json = $Export | ConvertTo-Json -Depth 10 | Out-String
-  Set-Content -Path "$OutputFolder/ModifiedProviderSettingsExport.json" -Value $Json
+  Set-Utf8NoBom -Content $Json -Location "$OutputFolder" -FileName "ModifiedProviderSettingsExport.json"
 }
 
 function UpdateProviderExport{

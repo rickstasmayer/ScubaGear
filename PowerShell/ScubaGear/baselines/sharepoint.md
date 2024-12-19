@@ -1,13 +1,13 @@
 **`TLP:CLEAR`**
-# CISA M365 Security Configuration Baseline for SharePoint Online and OneDrive
+# CISA M365 Secure Configuration Baseline for SharePoint Online and OneDrive
 
 Microsoft 365 (M365) SharePoint Online is a web-based collaboration and document management platform. It is primarily used to collaborate on documents and communicate information in projects. M365 OneDrive is a cloud-based file storage system primarily used to store a user's personal files, but it can also be used to share documents with others. This secure configuration baseline (SCB) provides specific policies to strengthen the security of both services.
 
-The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
+The Secure Cloud Business Applications (SCuBA) project, run by the Cybersecurity and Infrastructure Security Agency (CISA), provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
-The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government's threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
+The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. While use of these baselines will be mandatory for civilian Federal Government agencies, organizations outside of the Federal Government may also find these baselines to be useful references to help reduce risks.
 
-The information in this document is provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
+For non-Federal users, the information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. Without limiting the generality of the foregoing, some controls and settings are not available in all products; CISA has no control over vendor changes to products offerings or features.  Accordingly, these SCuBA SCBs for M365 may not be applicable to the products available to you. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
@@ -30,18 +30,27 @@ This section helps reduce security risks related to sharing files with users ext
 
 ### Policies
 #### MS.SHAREPOINT.1.1v1
-External sharing for SharePoint SHALL be limited to Existing guests or Only People in your organization.
+External sharing for SharePoint SHALL be limited to Existing guests or Only people in your organization.
 
 <!--Policy: MS.SHAREPOINT.1.1v1; Criticality: SHALL -->
 - _Rationale:_ Sharing information outside the organization via SharePoint increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of access to information.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
+    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
 
 #### MS.SHAREPOINT.1.2v1
-External sharing for OneDrive SHALL be limited to Existing guests or Only People in your organization.
+External sharing for OneDrive SHALL be limited to Existing guests or Only people in your organization.
 
 <!--Policy: MS.SHAREPOINT.1.2v1; Criticality: SHALL -->
 - _Rationale:_ Sharing files outside the organization via OneDrive increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of unauthorized unauthorized access to information.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
+    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 #### MS.SHAREPOINT.1.3v1
 External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs.
@@ -49,7 +58,12 @@ External sharing SHALL be restricted to approved external domains and/or users i
 <!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL -->
 - _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators help prevent sharing with unknown organizations and individuals.
 - _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only People in your organization**.
+- _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only people in your organization**.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
+    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 #### MS.SHAREPOINT.1.4v1
 Guest access SHALL be limited to the email the invitation was sent to.
@@ -58,6 +72,11 @@ Guest access SHALL be limited to the email the invitation was sent to.
 - _Rationale:_ Email invitations allow external guests to access shared information. By requiring guests to sign in using the same account where the invite was sent, administrators help ensure only the intended guest can use the invite.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only People in your organization**.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
+    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 ### Resources
 
@@ -140,6 +159,12 @@ File and folder default sharing scope SHALL be set to Specific people (only the 
 <!--Policy: MS.SHAREPOINT.2.1v1; Criticality: SHALL -->
 - _Rationale:_ By making the default sharing the most restrictive, administrators prevent accidentally sharing information too broadly.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
+    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
+    - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
 
 #### MS.SHAREPOINT.2.2v1
 File and folder default sharing permissions SHALL be set to View.
@@ -147,6 +172,10 @@ File and folder default sharing permissions SHALL be set to View.
 <!--Policy: MS.SHAREPOINT.2.2v1; Criticality: SHALL -->
 - _Rationale:_ Edit access to files and folders could allow a user to make unauthorized changes.  By restricting default permissions to **View**, administrators prevent unintended or malicious modification.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
+  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
+    - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
 
 ### Resources
 
@@ -193,22 +222,35 @@ Expiration days for Anyone links SHALL be set to 30 days or less.
 - _Rationale:_ Links may be used to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for links, administrators prevent unintended sustained access to information.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone**.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
+    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 #### MS.SHAREPOINT.3.2v1
 The allowable file and folder permissions for links SHALL be set to View only.
 
-<!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL -->
+<!--Policy: MS.SHAREPOINT.3.2v1; Criticality: SHALL -->
 - _Rationale:_ Unauthorized changes to files can be made if permissions allow editing by anyone.  By restricting permissions on links to **View** only, administrators prevent anonymous file changes.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone**.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
+  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
+    - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
 
 #### MS.SHAREPOINT.3.3v1
 Reauthentication days for people who use a verification code SHALL be set to 30 days or less.
 
-<!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL -->
+<!--Policy: MS.SHAREPOINT.3.3v1; Criticality: SHALL -->
 - _Rationale:_ A verification code may be given out to provide access to information for a short period of time. By setting expiration timers for verification code access, administrators prevent  unintended sustained access to information.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone** or **New and existing guests**.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
+  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
+    - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
 
 ### License Requirements
 
@@ -265,61 +307,4 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 6. Select **Save**.
 
-## 4. Custom Scripts
-
-This section provides policies for restricting custom scripts execution.
-
-### Policies
-
-#### MS.SHAREPOINT.4.1v1
-Users SHALL be prevented from running custom scripts on personal sites (aka OneDrive).
-
-<!--Policy: MS.SHAREPOINT.4.1v1; Criticality: SHALL -->
-- _Rationale:_ Scripts in OneDrive folders run in the context of user visiting the site and have access to everything users can access. By preventing custom scripts on personal sites, administrators block a path for potentially malicious code execution.
-- _Last modified:_ June 2023
-
-#### MS.SHAREPOINT.4.2v1
-Users SHALL be prevented from running custom scripts on self-service created sites.
-
-<!--Policy: MS.SHAREPOINT.4.2v1; Criticality: SHALL -->
-- _Rationale:_ Scripts on SharePoint sites run in the context of users visiting the site and therefore provide access to everything users can access. By preventing custom scripts on self-service created sites, administrators block a path for potentially malicious code execution.
-- _Last modified:_ June 2023
-
-### Resources
-
-- [Allow or prevent custom script \| Microsoft
-  Documents](https://docs.microsoft.com/en-us/sharepoint/allow-or-prevent-custom-script)
-
-### License Requirements
-
-- N/A
-
-### Implementation
-
-#### MS.SHAREPOINT.4.1v1 Instructions
-
-1.  Sign in to the **SharePoint admin center**.
-
-2.  Select **Settings**.
-
-3.  Scroll down and select **classic settings page**.
-
-4.  Scroll to the **Custom Script** section.
-
-5.  Select **Prevent users from running custom script on personal sites**.
-
-6.  Select **OK**.
-
-#### MS.SHAREPOINT.4.2v1 Instructions
-
-1.  Sign in to the **SharePoint admin center**.
-
-2.  Select **Settings**.
-
-3.  Scroll down and select **classic settings page**.
-
-4.  Scroll to the **Custom Script** section.
-
-5.  Select **Prevent users from running custom script on self-service created sites**.
-
-6.  Select **OK**.
+**`TLP:CLEAR`**

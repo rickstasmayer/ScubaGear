@@ -1,46 +1,20 @@
 **`TLP:CLEAR`**
 
-# CISA M365 Security Configuration Baseline for Defender
+# CISA M365 Secure Configuration Baseline for Defender
 
-Microsoft 365 (M365) Defender is a cloud-based enterprise defense suite that
-coordinates prevention, detection, investigation, and response. This set
-of tools and features are used to detect many types of attacks.
+Microsoft 365 (M365) Defender is a cloud-based enterprise defense suite that coordinates prevention, detection, investigation, and response. This set of tools and features are used to detect many types of attacks.
 
-This baseline focuses on the features of Defender for Office 365, but
-some settings are actually configured in the Microsoft Purview
-compliance portal. However, for simplicity, both the
-M365 Defender and Microsoft Purview compliance portal
-items are contained in this baseline.
+This baseline focuses on the features of Defender for Office 365, but some settings are actually configured in the Microsoft Purview compliance portal. However, for simplicity, both the M365 Defender and Microsoft Purview compliance portal items are contained in this baseline.
 
-Generally, use of Microsoft Defender is not required by the baselines of
-the core M365 products (Exchange Online, Teams, etc.). This baseline serves as
-a guide should an agency elect to use Defender as their tool of choice. Please
-note that some of the controls in the core baselines require the use of a
-dedicated security tool, such as Defender.
+Generally, use of Microsoft Defender is not required by the baselines of the core M365 products (Exchange Online, Teams, etc.). Should an agency elect to use Defender as their tool of choice, agencies should apply these baseline settings. Please note that some of the controls in the core baselines require the use of a dedicated security tool that provides comparable protection as Defender.   In addition to applying these controls, agencies should consider using a cloud access security broker to secure their environments as they adopt zero trust principles.
 
-In addition to these controls, agencies should consider using a cloud
-access security broker to secure their environments as they adopt zero
-trust principles.
+The Secure Cloud Business Applications (SCuBA) project, run by the Cybersecurity and Infrastructure Security Agency (CISA), provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
-The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity
-and Infrastructure Security Agency (CISA) provides guidance and capabilities to
-secure federal civilian executive branch (FCEB) agencies' cloud business
-application environments and protect federal information that is created,
-accessed, shared, and stored in those environments.
+The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. While use of these baselines will be mandatory for civilian Federal Government agencies, organizations outside of the Federal Government may also find these baselines to be useful references to help reduce risks.
 
-The CISA SCuBA SCBs for M365 help secure federal information assets stored within
-M365 cloud business application environments through consistent, effective, and
-manageable security configurations. CISA created baselines tailored to the federal
-government's threats and risk tolerance with the knowledge that every organization
-has different threat models and risk tolerance. Non-governmental organizations may
-also find value in applying these baselines to reduce risks.
+For non-Federal users, the information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. Without limiting the generality of the foregoing, some controls and settings are not available in all products; CISA has no control over vendor changes to products offerings or features.  Accordingly, these SCuBA SCBs for M365 may not be applicable to the products available to you. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
 
-The information in this document is provided “as is” for INFORMATIONAL PURPOSES
-ONLY. CISA does not endorse any commercial product or service, including any
-subjects of analysis. Any reference to specific commercial entities or commercial
-products, processes, or services by service mark, trademark, manufacturer, or
-otherwise does not constitute or imply endorsement, recommendation, or favoritism
-by CISA. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
+
 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
@@ -78,9 +52,15 @@ The standard and strict preset security policies SHALL be enabled.
 <!--Policy: MS.DEFENDER.1.1v1; Criticality: SHALL -->
 - _Rationale:_ Defender includes a large number of features and settings to protect users against threats. Using the preset security policies, administrators can help ensure all new and existing users automatically have secure defaults applied.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+    - [T1566.003: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
+
 
 #### MS.DEFENDER.1.2v1
-All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
+All users SHALL be added to Exchange Online Protection (EOP) in either the standard or strict preset security policy.
 
 <!--Policy: MS.DEFENDER.1.2v1; Criticality: SHALL -->
 - _Rationale:_ Important user protections are provided by EOP, including anti-spam, anti-malware, and anti-phishing protections. By using the preset policies, administrators can help ensure all new and existing users have secure defaults applied automatically.
@@ -89,6 +69,11 @@ All users SHALL be added to Exchange Online Protection in either the standard or
   - The standard and strict preset security policies must be enabled as directed
     by [MS.DEFENDER.1.1v1](#msdefender11v1) for protections to be applied.
   - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided they are added to one or more custom policies offering comparable protection. These users might need flexibility not offered by the preset policies. Their accounts should be added to a custom policy conforming, as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+    - [T1566.003: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
 
 #### MS.DEFENDER.1.3v1
 All users SHALL be added to Defender for Office 365 protection in either the standard or strict preset security policy.
@@ -100,6 +85,11 @@ All users SHALL be added to Defender for Office 365 protection in either the sta
   - The standard and strict preset security policies must be enabled as directed
     by [MS.DEFENDER.1.1v1](#msdefender11v1) for protections to be applied.
   - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided they are added to one or more custom policies offering comparable protection. These users might need flexibility not offered by the preset policies. Their accounts should be added to a custom policy conforming as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+    - [T1566.003: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
 
 #### MS.DEFENDER.1.4v1
 Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
@@ -109,6 +99,10 @@ Sensitive accounts SHALL be added to Exchange Online Protection in the strict pr
 - _Last modified:_ June 2023
 - _Note:_ The strict preset security policy must be enabled to protect
           sensitive accounts.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
 
 #### MS.DEFENDER.1.5v1
 Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.
@@ -118,6 +112,10 @@ Sensitive accounts SHALL be added to Defender for Office 365 protection in the s
 - _Last modified:_ June 2023
 - _Note:_ The strict preset security policy must be enabled to protect
           sensitive accounts.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
 
 ### Resources
 
@@ -134,7 +132,7 @@ Sensitive accounts SHALL be added to Defender for Office 365 protection in the s
 
 ### License Requirements
 
-- Defender for Office 365 capabilities require Defender for Office 365 Plan 1 or 2. These are included with E5 and G5 and are available as add-ons for E3 and G3.
+- Defender for Office 365 capabilities require Defender for Office 365 Plan 1 or 2. These are included with E5 and G5 and are available as add-ons for E3 and G3. However, third-party solutions can be used to meet this requirement. If a third-party solution is used, then a Defender for Office 365 Plan 1 or 2, E5, and G5 license is not required for the respective policies.
 
 ### Implementation
 
@@ -226,6 +224,11 @@ User impersonation protection SHOULD be enabled for sensitive accounts in both t
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect accounts.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
 
 #### MS.DEFENDER.2.2v1
 Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.
@@ -235,6 +238,11 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect agency domains.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
 
 #### MS.DEFENDER.2.3v1
 Domain impersonation protection SHOULD be added for important partners in both the standard and strict preset policies.
@@ -244,6 +252,11 @@ Domain impersonation protection SHOULD be added for important partners in both t
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect partner domains.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
 
 ### Resources
 
@@ -331,6 +344,12 @@ Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams
 <!--Policy: MS.DEFENDER.3.1v1; Criticality: SHOULD -->
 - _Rationale:_ Clicking malicious links makes users vulnerable to attacks, and this danger is not limited to links in emails. Other Microsoft products, such as Microsoft Teams, can be used to present users with malicious links. As such, it is important to protect users on these other Microsoft products as well.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+  - [T1204.001: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+    - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
 
 ### Resources
 
@@ -382,15 +401,19 @@ confidence levels or adjust the levels in custom DLP policies to fit
 their environment and needs.
 
 ### Policies
-#### MS.DEFENDER.4.1v1
-A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency. At a minimum, credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN) SHALL be blocked.
+#### MS.DEFENDER.4.1v2
+A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency, blocking at a minimum: credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN).
 
-<!--Policy: MS.DEFENDER.4.1v1; Criticality: SHALL -->
+<!--Policy: MS.DEFENDER.4.1v2; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with
                others who should not have access to it. DLP policies
                provide a way for agencies to detect and prevent
                unauthorized disclosures.
-- _Last modified:_ June 2023
+- _Last modified:_ November 2024
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
 
 #### MS.DEFENDER.4.2v1
 The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices.
@@ -401,7 +424,13 @@ The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams cha
                affected locations to be effective.
 - _Last modified:_ June 2023
 - _Note:_ The custom policy referenced here is the same policy
-          configured in [MS.DEFENDER.4.1v1](#msdefender41v1).
+          configured in [MS.DEFENDER.4.1v2](#msdefender41v2).
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
+    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+
 #### MS.DEFENDER.4.3v1
 The action for the custom policy SHOULD be set to block sharing sensitive information with everyone.
 
@@ -411,7 +440,11 @@ The action for the custom policy SHOULD be set to block sharing sensitive inform
                on agency policies and valid business justifications.
 - _Last modified:_ June 2023
 - _Note:_ The custom policy referenced here is the same policy
-          configured in [MS.DEFENDER.4.1v1](#msdefender41v1).
+          configured in [MS.DEFENDER.4.1v2](#msdefender41v2).
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
 
 #### MS.DEFENDER.4.4v1
 Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled in the custom policy.
@@ -423,7 +456,9 @@ Notifications to inform users and help educate them on the proper use of sensiti
                accessing sensitive information.
 - _Last modified:_ June 2023
 - _Note:_ The custom policy referenced here is the same policy
-          configured in [MS.DEFENDER.4.1v1](#msdefender41v1).
+          configured in [MS.DEFENDER.4.1v2](#msdefender41v2).
+- _MITRE ATT&CK TTP Mapping:_
+  - None
 
 #### MS.DEFENDER.4.5v1
 A list of apps that are restricted from accessing files protected by DLP policy SHOULD be defined.
@@ -435,6 +470,10 @@ A list of apps that are restricted from accessing files protected by DLP policy 
                possible to use DLP policies to restrict those apps' access
                to sensitive information on endpoints using Defender.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
+  - [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 #### MS.DEFENDER.4.6v1
 The custom policy SHOULD include an action to block access to sensitive
@@ -450,10 +489,15 @@ information by restricted apps and unwanted Bluetooth applications.
 - _Last modified:_ June 2023
 - _Note:_
   - The custom policy referenced here is the same policy
-    configured in [MS.DEFENDER.4.1v1](#msdefender41v1).
+    configured in [MS.DEFENDER.4.1v2](#msdefender41v2).
   - This action can only be included if at least one device is onboarded
     to the agency tenant. Otherwise, the option to block restricted apps will
     not be available.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
+  - [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1486: Data Encrypted for Impact](https://attack.mitre.org/techniques/T1486/)
 
 ### Resources
 
@@ -476,17 +520,19 @@ information by restricted apps and unwanted Bluetooth applications.
 
 - DLP for Teams requires an E5 or G5 license. See [Microsoft Purview Data Loss Prevention: Data Loss Prevention for Teams \| Microsoft
   Learn](https://learn.microsoft.com/en-us/office365/servicedescriptions/microsoft-365-service-descriptions/microsoft-365-tenantlevel-services-licensing-guidance/microsoft-365-security-compliance-licensing-guidance#microsoft-purview-data-loss-prevention-data-loss-prevention-dlp-for-teams)
-  for more information.
+  for more information. However, this requirement can also be met through a third-party solution. If a third-party solution is used, then a E5 or G5 license is not required for the respective policies.
+
 
 - DLP for Endpoint requires an E5 or G5 license. See [Get started with
   Endpoint data loss prevention - Microsoft Purview (compliance) \|
   Microsoft
   Learn](https://learn.microsoft.com/en-us/purview/endpoint-dlp-getting-started?view=o365-worldwide)
-  for more information.
+  for more information. However, this requirement can also be met through a third-party solution. If a third-party solution is used, then a E5 or G5 license is not required for the respective policies.
+
 
 ### Implementation
 
-#### MS.DEFENDER.4.1v1 Instructions
+#### MS.DEFENDER.4.1v2 Instructions
 
 1. Sign in to the **Microsoft Purview compliance portal**.
 
@@ -549,18 +595,18 @@ information by restricted apps and unwanted Bluetooth applications.
 
 #### MS.DEFENDER.4.2v1 Instructions
 
-See [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) step 8
+See [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) step 8
    for details on enforcing DLP policy in specific M365 service locations.
 
 #### MS.DEFENDER.4.3v1 Instructions
 
-See [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) steps
+See [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) steps
    15-17 for details on configuring DLP policy to block sharing sensitive
    information with everyone.
 
 #### MS.DEFENDER.4.4v1 Instructions
 
-See [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) steps
+See [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) steps
    18-19 for details on configuring DLP policy to notify users when accessing
    sensitive information.
 
@@ -599,7 +645,7 @@ before the instructions below can be completed.
 3. Select **Policies** from the top of the page.
 
 4. Find the custom DLP policy configured under
-   [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) in the list
+   [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) in the list
    and click the Policy name to select.
 
 5. Select **Edit Policy**.
@@ -633,24 +679,30 @@ before the instructions below can be completed.
 
 There are several pre-built alert policies available pertaining to
 various apps in the M365 suite. These alerts give administrators better
-real-time insight into possible security incidents. Guidance on specific alerts to configure can be found in the linked section of the CISA M365 Security Configuration Baseline for Exchange Online.
+real-time insight into possible security incidents. Guidance on specific alerts to configure can be found in the linked section of the CISA M365 Secure Configuration Baseline for Exchange Online.
 
-- [MS.EXO.16.1v1 \| CISA M365 Security Configuration Baseline for Exchange Online](./exo.md#msexo161v1)
+- [MS.EXO.16.1v1 \| CISA M365 Secure Configuration Baseline for Exchange Online](./exo.md#msexo161v1)
 
 ### Policies
 #### MS.DEFENDER.5.1v1
-At a minimum, the alerts required by the CISA M365 Security Configuration Baseline for Exchange Online SHALL be enabled.
+At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline for Exchange Online SHALL be enabled.
 
 <!--Policy: MS.DEFENDER.5.1v1; Criticality: SHALL -->
 - _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
+    - [T1562.006: Indicator Blocking](https://attack.mitre.org/techniques/T1562/006/)
 
 #### MS.DEFENDER.5.2v1
-The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
+The alerts SHOULD be sent to a monitored address or incorporated into a Security Information and Event Management (SIEM).
 
 <!--Policy: MS.DEFENDER.5.2v1; Criticality: SHOULD -->
-- _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or Security Information and Event Management (SIEM) system helps ensure events are acted upon in a timely manner to limit overall impact.
+- _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or SIEM system helps ensure events are acted upon in a timely manner to limit overall impact.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
+    - [T1562.006: Indicator Blocking](https://attack.mitre.org/techniques/T1562/006/)
 
 ### Resources
 
@@ -673,7 +725,21 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 4. Select the checkbox next to each alert to enable as determined by the
    agency and at a minimum those referenced in the
-   [_CISA M365 Security Configuration Baseline for Exchange Online_](./exo.md#msexo161v1).
+   [_CISA M365 Secure Configuration Baseline for Exchange Online_](./exo.md#msexo161v1) which are:
+
+   a. **Suspicious email sending patterns detected.**
+
+   b. **Suspicious connector activity.**
+
+   c. **Suspicious Email Forwarding Activity.**
+
+   d. **Messages have been delayed.**
+
+   e. **Tenant restricted from sending unprovisioned email.**
+
+   f. **Tenant restricted from sending email.**
+
+   g. **A potentially malicious URL click was detected.**
 
 5. Click the pencil icon from the top menu.
 
@@ -730,12 +796,16 @@ Microsoft Purview Audit (Standard) logging SHALL be enabled.
 <!--Policy: MS.DEFENDER.6.1v1; Criticality: SHALL -->
 - _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Microsoft Purview Audit (Standard) helps ensure agencies have visibility into user actions. Furthermore, enabling the unified audit log is required for government agencies by OMB M-21-31 (referred to therein by its former name, Unified Audit Logs).
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
+    - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
+
 
 #### MS.DEFENDER.6.2v1
 Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
 
 <!--Policy: MS.DEFENDER.6.2v1; Criticality: SHALL -->
-- _Rationale:_ Standard logging may not include relevant details necessary for visibility into user actions during an incident. Enabling Microsoft Purview Audit (Premium) captures additional event types not included with Standard. Furthermore, it is required for government agencies by OMB M-21-13 (referred to therein as by its former name, Unified Audit Logs w/Advanced Features).
+- _Rationale:_ Standard logging may not include relevant details necessary for visibility into user actions during an incident. Enabling Microsoft Purview Audit (Premium) captures additional event types not included with Standard. Furthermore, it is required for government agencies by OMB M-21-31 (referred to therein as by its former name, Unified Audit Logs w/Advanced Features).
 - _Last modified:_ June 2023
 - _Note:_ At the time of this writing, Microsoft has announced upcoming changes
           to its Purview Audit service that include making audit events
@@ -743,6 +813,8 @@ Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
           Audit (Standard) subscribers. After rollout of changes are complete,
           Purview (Standard) may be sufficient for agencies to meet basic
           logging requirements.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
 
 #### MS.DEFENDER.6.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
@@ -752,10 +824,13 @@ Audit logs SHALL be maintained for at least the minimum duration dictated by OMB
 - _Last modified:_ June 2023
 - _Note_: Purview Audit (Premium) provides a default audit log retention policy,
           retaining Exchange Online, SharePoint Online, OneDrive for
-          Business, and Azure Active Directory audit records for one year.
+          Business, and Microsoft Entra ID audit records for one year.
           Additional record types require custom audit retention policies.
           Agencies may also consider alternate storage locations and services
           to meet audit log retention needs.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
+
 
 ### Resources
 
@@ -778,6 +853,11 @@ Related to Cybersecurity Incidents \| Office of Management and
 - [Expanding cloud logging to give customers deeper security visibility \|
   Microsoft Security Blog](https://www.microsoft.com/en-us/security/blog/2023/07/19/expanding-cloud-logging-to-give-customers-deeper-security-visibility/)
 
+- [Export, configure, and view audit log records | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-export-records)
+
+- [Untitled Goose Tool Fact Sheet | CISA.](https://www.cisa.gov/resources-tools/resources/untitled-goose-tool-fact-sheet)
+
+- [Manage audit log retention policies | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?tabs=microsoft-purview-portal#before-you-create-an-audit-log-retention-policy)
 
 ### License Requirements
 
@@ -787,8 +867,7 @@ Related to Cybersecurity Incidents \| Office of Management and
 
 - Additionally, maintaining logs in the M365 environment for longer than
   one year requires an add-on license. For more information, see
-  [Licensing requirements \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/purview/audit-solutions-overview?view=o365-worldwide#licensing-requirements).
+  [Manage audit log retention policies | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?tabs=microsoft-purview-portal#before-you-create-an-audit-log-retention-policy). However, this requirement can also be met by exporting the logs from M365 and storing them with your solution of choice, in which case audit log retention policies are not necessary.
 
 ### Implementation
 
@@ -812,7 +891,8 @@ Learn.](https://learn.microsoft.com/en-us/purview/audit-premium-setup?view=o365-
 
 #### MS.DEFENDER.6.3v1 Instructions
 To create one or more custom audit retention policies, if the default retention policy is not sufficient for agency needs, follow [Create an audit log retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy) instructions.
-Ensure the duration selected in the retention policies is at least one year,
-in accordance with OMB M-21-31.
+Ensure the duration selected in the retention policies is at least one year, in accordance with OMB M-21-31. 
+
+As noted in the [License Requirements](https://github.com/cisagov/ScubaGear/baselines/defender.md#license-requirements-1) section above, the creation of a custom audit log retention policy and its retention in the M365 environment requires E5/G5 licenses or E3/G3 licenses with add-on compliance licenses. No additional license is required to view and export logs. To view and export audit logs follow [Export, configure, and view audit log records | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-export-records) and/or [Untitled Goose Tool Fact Sheet | CISA.](https://www.cisa.gov/resources-tools/resources/untitled-goose-tool-fact-sheet)
 
 **`TLP:CLEAR`**

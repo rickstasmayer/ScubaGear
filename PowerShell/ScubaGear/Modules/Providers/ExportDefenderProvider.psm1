@@ -2,7 +2,7 @@ function Export-DefenderProvider {
     <#
     .Description
     Gets the Microsoft 365 Defender settings that are relevant
-    to the SCuBA Microsft 365 Defender baselines using the EXO PowerShell Module
+    to the SCuBA Microsoft 365 Defender baselines using the Graph and EXO PowerShell Modules
     .Functionality
     Internal
     #>
@@ -41,10 +41,11 @@ function Export-DefenderProvider {
             if ($ServicePrincipalParams) {
                 $EXOHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
             }
+
             Connect-EXOHelper @ServicePrincipalParams;
         }
         catch {
-            Write-Error "Error connecting to ExchangeOnline. $($_)"
+            Write-Warning "Error connecting to ExchangeOnline: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         }
     }
 
@@ -93,25 +94,42 @@ function Export-DefenderProvider {
         $IPPSConnected = $true
     }
     catch {
-        Write-Error "Error running Connect-IPPSSession. $($_)"
+        Write-Warning "Error running Connect-IPPSSession: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         Write-Warning "Omitting the following commands: Get-DlpCompliancePolicy, Get-DlpComplianceRule, and Get-ProtectionAlert."
         $Tracker.AddUnSuccessfulCommand("Get-DlpCompliancePolicy")
         $Tracker.AddUnSuccessfulCommand("Get-DlpComplianceRule")
         $Tracker.AddUnSuccessfulCommand("Get-ProtectionAlert")
     }
     if ($IPPSConnected) {
-        $DLPCompliancePolicy = ConvertTo-Json @($Tracker.TryCommand("Get-DlpCompliancePolicy"))
-        $ProtectionAlert = ConvertTo-Json @($Tracker.TryCommand("Get-ProtectionAlert"))
-        $DLPComplianceRules = @($Tracker.TryCommand("Get-DlpComplianceRule"))
+        if (Get-Command Get-DlpCompliancePolicy -ErrorAction SilentlyContinue) {
+            $DLPCompliancePolicy = ConvertTo-Json @($Tracker.TryCommand("Get-DlpCompliancePolicy"))
+            $ProtectionAlert = ConvertTo-Json @($Tracker.TryCommand("Get-ProtectionAlert"))
+            $DLPComplianceRules = @($Tracker.TryCommand("Get-DlpComplianceRule"))
+            $DLPLicense = ConvertTo-Json $true
 
         # Powershell is inconsistent with how it saves lists to json.
         # This loop ensures that the format of ContentContainsSensitiveInformation
         # will *always* be a list.
 
-        foreach($Rule in $DLPComplianceRules) {
-            if ($Rule.Count -gt 0) {
-                $Rule.ContentContainsSensitiveInformation = @($Rule.ContentContainsSensitiveInformation)
+            foreach($Rule in $DLPComplianceRules) {
+                if ($Rule.Count -gt 0) {
+                    $Rule.ContentContainsSensitiveInformation = @($Rule.ContentContainsSensitiveInformation)
+                }
             }
+        }
+        else {
+            Write-Warning "Defender for DLP license not available in tenant. Omitting the following commands: Get-DlpCompliancePolicy, Get-DlpComplianceRule, and Get-ProtectionAlert."
+            $DLPCompliancePolicy = ConvertTo-Json @()
+            $DLPComplianceRules = ConvertTo-Json @()
+            $ProtectionAlert = ConvertTo-Json @()
+            $DLPComplianceRules = ConvertTo-Json @()
+            $Tracker.AddUnSuccessfulCommand("Get-DlpCompliancePolicy")
+            $Tracker.AddUnSuccessfulCommand("Get-DlpComplianceRule")
+            $Tracker.AddUnSuccessfulCommand("Get-ProtectionAlert")
+            $Tracker.AddSuccessfulCommand("Get-DlpCompliancePolicy")
+            $Tracker.AddSuccessfulCommand("Get-DlpComplianceRule")
+            $Tracker.AddSuccessfulCommand("Get-ProtectionAlert")
+            $DLPLicense = ConvertTo-Json $false
         }
 
         # We need to specify the depth because the data contains some
@@ -123,6 +141,23 @@ function Export-DefenderProvider {
         $DLPComplianceRules = ConvertTo-Json @()
         $ProtectionAlert = ConvertTo-Json @()
         $DLPComplianceRules = ConvertTo-Json @()
+        $DLPLicense = ConvertTo-Json $false
+    }
+
+    # Get count of users without Advanced auditing enabled
+    # GUID below is service plan ID for M365_ADVANCED_AUDITING as defined
+    # on Microsoft Licensing Reference shown here:
+    # https://learn.microsoft.com/en-us/entra/identity/users/licensing-service-plan-reference
+    $UserParameters = @{ConsistencyLevel = 'eventual'
+                        Count = 'UsersWithoutAdvancedAuditCount'
+                        Top = 1
+                        Filter = "not assignedPlans/any(a:a/servicePlanId eq 2f442157-a11c-46b9-ae5b-6e39ff4e5849 and a/capabilityStatus eq 'Enabled')"
+                       }
+
+    $Tracker.TryCommand("Get-MgBetaUser", $UserParameters) | Out-Null
+
+    if(-Not $UsersWithoutAdvancedAuditCount -Or (-Not $UsersWithoutAdvancedAuditCount -is [int])) {
+        $UsersWithoutAdvancedAuditCount = "-1"
     }
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
@@ -138,7 +173,9 @@ function Export-DefenderProvider {
     "protection_alerts": $ProtectionAlert,
     "admin_audit_log_config": $AdminAuditLogConfig,
     "atp_policy_for_o365": $ATPPolicy,
+    "total_users_without_advanced_audit": $UsersWithoutAdvancedAuditCount,
     "defender_license": $DefenderLicense,
+    "defender_dlp_license": $DLPLicense,
     "defender_successful_commands": $SuccessfulCommands,
     "defender_unsuccessful_commands": $UnSuccessfulCommands,
 "@

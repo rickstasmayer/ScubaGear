@@ -97,14 +97,10 @@ param (
     $Variant = [string]::Empty
 )
 
-$ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
-$ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
-$ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
-Import-Module $ScubaModule
-Import-Module $ConnectionModule
-Import-Module Selenium
-
-BeforeDiscovery{
+BeforeDiscovery {
+    $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
+    $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
+    Import-Module $ScubaModule
 
     if ($Variant) {
         $TestPlanFileName = "TestPlans/$ProductName.$Variant.testplan.yaml"
@@ -151,8 +147,15 @@ BeforeDiscovery{
     }
 }
 
-BeforeAll{
+BeforeAll {
     # Shared Data for functional test
+    $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
+    $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
+    $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
+    Import-Module $ScubaModule
+    Import-Module $ConnectionModule
+    Import-Module Selenium
+
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
     $ProductDetails = @{
         aad = "Azure Active Directory"
@@ -180,27 +183,21 @@ BeforeAll{
         )
 
         ForEach($Condition in $Conditions){
-
             $Splat = $Condition.Splat
-
             if ('Cached' -eq $PSCmdlet.ParameterSetName){
                 $Splat.Add("OutputFolder", [string]$OutputFolder)
             }
-
-            if ($Splat ) {
+            if ($Splat) {
                 $ScriptBlock = [ScriptBlock]::Create("$($Condition.Command) @Splat")
             }
             else {
                 $ScriptBlock = [ScriptBlock]::Create("$($Condition.Command)")
             }
-
-
             try {
                 $ScriptBlock.Invoke()
             }
             catch {
                 Write-Error "Exception: SetConditions failed. $_"
-
             }
         }
     }
@@ -208,18 +205,20 @@ BeforeAll{
     function RunScuba() {
         if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
-            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet
+            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON
         }
         else {
-            Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet
+            Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON
         }
     }
 }
 
 Describe "Policy Checks for <ProductName>"{
-    Context "Start tests for policy <PolicyId>" -ForEach $TestPlan{
-        BeforeEach{
 
+    Context "Start tests for policy <PolicyId>" -ForEach $TestPlan{
+        BeforeEach {
+            # Select which TestDriver to use for a given test plan. TestDriver names (e.g. RunScuba, ScubaCached) must
+            # match exactly (including case) the ones used in TestPlans.
             if ($ConfigFileName -and ('RunScuba' -eq $TestDriver)){
                 $FullPath = Join-Path -Path $PSScriptRoot -ChildPath "TestConfigurations/$ProductName/$PolicyId/$ConfigFileName"
 
@@ -242,20 +241,22 @@ Describe "Policy Checks for <ProductName>"{
 
                 Set-Content -Path $TestConfigFilePath -Value ($ScubaConfig | ConvertTo-Yaml)
                 SetConditions -Conditions $Preconditions.ToArray()
-                Invoke-SCuBA -ConfigFilePath $TestConfigFilePath -Quiet
+                Invoke-SCuBA -ConfigFilePath $TestConfigFilePath -Quiet -KeepIndividualJSON
             }
+            # Ensure case matches driver in test plan
             elseif ('RunScuba' -eq $TestDriver){
                 Write-Debug "Driver: RunScuba"
                 SetConditions -Conditions $Preconditions.ToArray()
                 RunScuba
             }
-            elseif ('RunCached' -eq $TestDriver){
-                Write-Debug "Driver: RunCached"
+            # Ensure case matches driver in test plan
+            elseif ('ScubaCached' -eq $TestDriver){
+                Write-Debug "Driver: ScubaCached"
                 RunScuba
                 $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
                 $OutputFolder = $ReportFolders[0].Name
                 SetConditions -Conditions $Preconditions.ToArray() -OutputFolder $OutputFolder
-                Invoke-RunCached -Productnames $ProductName -ExportProvider $false -OutPath $OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet
+                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath $OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON
             }
             else {
                 Write-Debug "Driver: $TestDriver"
@@ -271,7 +272,7 @@ Describe "Policy Checks for <ProductName>"{
             $PolicyResultObj = $IntermediateTestResults | Where-Object { $_.PolicyId -eq $PolicyId }
             $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
             $Url = (Get-Item $BaselineReports).FullName
-            $Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates')
+            $Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates') -Verbose
             Open-SeUrl $Url -Driver $Driver | Out-Null
         }
         Context "Execute test, <TestDescription>" -ForEach $Tests {
@@ -283,10 +284,6 @@ Describe "Policy Checks for <ProductName>"{
 
                 $Details = $PolicyResultObj.ReportDetails
                 $Details | Should -Not -BeNullOrEmpty -Because "expect details, $Details"
-
-                if ($IsNotChecked){
-                    $Details | Should -Match 'This product does not currently have the capability to check compliance for this policy.+'
-                }
 
                 if ($IsCustomImplementation){
                     $Details | Should -Match 'A custom product can be used to fulfill this policy requirement.+'
@@ -332,6 +329,9 @@ Describe "Policy Checks for <ProductName>"{
                             }
                         }
                     }
+                    elseif ($Table.GetProperty("id") -eq "license-info"){
+                        #Currently empty to determine if necessary and what to test in section
+                    }
                     else {
                         # Control report tables
                         ForEach ($Row in $Rows){
@@ -357,12 +357,11 @@ Describe "Policy Checks for <ProductName>"{
                                         $RowData[4].text | Should -Match 'A custom product can be used to fulfill this policy requirement.+'
                                     }
                                     elseif ($IsNotChecked){
-                                        $RowData[2].text | Should -BeLikeExactly "N/A" -Because "custom policies should not have results. [$Msg]"
-                                        $RowData[4].text | Should -Match 'This product does not currently have the capability to check compliance for this policy.+'
+                                        $RowData[2].text | Should -BeLikeExactly "N/A" -Because "policies that are not checked should be N/A. [$Msg]"
                                     }
                                     elseif ($true -eq $ExpectedResult) {
                                         $RowData[2].text | Should -BeLikeExactly "Pass" -Because "expected policy to pass. [$Msg]"
-                                        $RowData[4].GetAttribute("innerHTML") | FromInnerHtml | Should -BeExactly $PolicyResultObj.ReportDetails
+                                        IsEquivalence -First $RowData[4].GetAttribute("innerHTML") -Second $PolicyResultObj.ReportDetails | Should -BeTrue
                                     }
                                     elseif ($null -ne $ExpectedResult ) {
                                         if ('Shall' -eq $RowData[3].text){
@@ -374,8 +373,7 @@ Describe "Policy Checks for <ProductName>"{
                                         else {
                                             $RowData[2].text | Should -BeLikeExactly "Unknown" -Because "unexpected criticality. [$Msg]"
                                         }
-
-                                        $RowData[4].GetAttribute("innerHTML") | FromInnerHtml | Should -BeExactly $PolicyResultObj.ReportDetails
+                                        IsEquivalence -First $RowData[4].GetAttribute("innerHTML") -Second $PolicyResultObj.ReportDetails | Should -BeTrue
                                     }
                                     else {
                                         $false | Should -BeTrue -Because "policy should be custom, not checked, or have and expected result. [$Msg]"

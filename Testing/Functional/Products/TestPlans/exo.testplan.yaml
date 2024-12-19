@@ -14,19 +14,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.EXO.2.1v1
-    TestDriver: RunScuba
+  - PolicyId: MS.EXO.2.2v2
+    TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.EXO.2.1v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-
-  - PolicyId: MS.EXO.2.2v1
-    TestDriver: RunCached
-    Tests:
-      - TestDescription: MS.EXO.2.2v1 Non-Compliant case - SPF policy is missing for one of the domains
+      - TestDescription: MS.EXO.2.2v2 Non-Compliant case - SPF policy is missing for one of the domains
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -41,7 +32,7 @@ TestPlan:
                       - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.EXO.2.2v1 Compliant case - SPF policy is published for the domains
+      - TestDescription: MS.EXO.2.2v2 Compliant case - SPF policy is published for the domains
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -59,7 +50,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.EXO.3.1v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.3.1v1 Non-Compliant case - DKIM is missing for one of the domains
         Preconditions:
@@ -107,7 +98,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.EXO.4.1v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.4.1v1 Non-Compliant case - DMARC is missing for one of the domains
         Preconditions:
@@ -138,7 +129,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.EXO.4.2v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.4.2v1 Non-Compliant case - DMARC p=reject is missing for one of the domains
         Preconditions:
@@ -170,7 +161,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.EXO.4.3v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.4.3v1 Non-Compliant case - DMARC DHS rua point of contact is in the wrong field for one of the domains
         Preconditions:
@@ -202,7 +193,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.EXO.4.4v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.4.4v1 Non-Compliant case - DMARC DHS rua and ruf point of contact is in the wrong field for one of the domains
         Preconditions:
@@ -299,28 +290,46 @@ TestPlan:
           - Command: 'Get-TransportRule | Where {$_.Identity -eq "FunctionalTest External sender warning"} | Remove-TransportRule -Confirm:$false'
         ExpectedResult: true
 
-  - PolicyId: MS.EXO.8.1v1
+  - PolicyId: MS.EXO.8.1v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.8.1v1 Custom Implementation
+      - TestDescription: MS.EXO.8.1v2 Custom Implementation
         Preconditions: []
         Postconditions: []
         IsCustomImplementation: true
         ExpectedResult: false
 
-  - PolicyId: MS.EXO.8.2v1
+  - PolicyId: MS.EXO.8.2v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.8.2v1 Custom Implementation
+      - TestDescription: MS.EXO.8.2v2 Custom Implementation
         Preconditions: []
         Postconditions: []
         IsCustomImplementation: true
         ExpectedResult: false
 
-  - PolicyId: MS.EXO.9.1v1
+  - PolicyId: MS.EXO.8.3v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.9.1v1 Custom Implementation
+      - TestDescription: MS.EXO.8.3v1 Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false
+
+  - PolicyId: MS.EXO.8.4v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.8.4v1 Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false
+
+  - PolicyId: MS.EXO.9.1v2
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.9.1v2 Custom Implementation
         Preconditions: []
         Postconditions: []
         IsCustomImplementation: true
@@ -335,10 +344,28 @@ TestPlan:
         IsCustomImplementation: true
         ExpectedResult: false
 
-  - PolicyId: MS.EXO.9.3v1
+  - PolicyId: MS.EXO.9.3v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.9.3v1 Custom Implementation
+      - TestDescription: MS.EXO.9.3v2 Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false
+
+  - PolicyId: MS.EXO.9.4v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.9.4v1 Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false
+
+  - PolicyId: MS.EXO.9.5v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.9.5v1 Custom Implementation
         Preconditions: []
         Postconditions: []
         IsCustomImplementation: true
@@ -444,10 +471,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.EXO.14.1v1
+  - PolicyId: MS.EXO.14.1v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.14.1v1 Custom Implementation
+      - TestDescription: MS.EXO.14.1v2 Custom Implementation
         Preconditions: []
         Postconditions: []
         IsCustomImplementation: true
@@ -466,6 +493,15 @@ TestPlan:
     TestDriver: RunScuba
     Tests:
       - TestDescription: MS.EXO.14.3v1 Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false
+
+  - PolicyId: MS.EXO.14.1v2
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.14.4v1 Custom Implementation
         Preconditions: []
         Postconditions: []
         IsCustomImplementation: true

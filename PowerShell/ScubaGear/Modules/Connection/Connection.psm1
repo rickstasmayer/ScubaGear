@@ -62,33 +62,35 @@ function Connect-Tenant {
                        'RoleManagement.Read.Directory',
                        'GroupMember.Read.All',
                        'Directory.Read.All',
-                       'PrivilegedEligibilitySchedule.Read.AzureADGroup'
+                       'PrivilegedEligibilitySchedule.Read.AzureADGroup',
+                       'PrivilegedAccess.Read.AzureADGroup',
+                       'RoleManagementPolicy.Read.AzureADGroup'
                    )
                    $GraphParams = @{
-                       'ErrorAction' = 'Stop';
+                       'M365Environment' = $M365Environment;
+                       'Scopes' = $GraphScopes;
                    }
-                   if ($ServicePrincipalParams.CertThumbprintParams) {
-                       $GraphParams += @{
-                           CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
-                           ClientID = $ServicePrincipalParams.CertThumbprintParams.AppID;
-                           TenantId  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization also works here
-                       }
+                   if($ServicePrincipalParams) {
+                    $GraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
                    }
-                   else {
-                       $GraphParams += @{Scopes = $GraphScopes;}
-                   }
-                   switch ($M365Environment) {
-                       "gcchigh" {
-                           $GraphParams += @{'Environment' = "USGov";}
-                       }
-                       "dod" {
-                           $GraphParams += @{'Environment' = "USGovDoD";}
-                       }
-                   }
-                   Connect-MgGraph @GraphParams | Out-Null
+                   Connect-GraphHelper @GraphParams
                    $AADAuthRequired = $false
                }
                {($_ -eq "exo") -or ($_ -eq "defender")} {
+                   if($_ -eq "defender" -and $AADAuthRequired) {
+                       $GraphScopes = (
+                           'User.Read.All'
+                       )
+                       $GraphParams = @{
+                           'M365Environment' = $M365Environment;
+                           'Scopes'          = $GraphScopes;
+                       }
+                       if($ServicePrincipalParams) {
+                        $GraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                       }
+                       Connect-GraphHelper @GraphParams
+                       $AADAuthRequired = $false
+                   }
                    if ($EXOAuthRequired) {
                        $EXOHelperParams = @{
                            M365Environment = $M365Environment;
@@ -131,24 +133,13 @@ function Connect-Tenant {
                "sharepoint" {
                    if ($AADAuthRequired) {
                        $LimitedGraphParams = @{
+                           'M365Environment' = $M365Environment;
                            'ErrorAction' = 'Stop';
                        }
-                       if ($ServicePrincipalParams.CertThumbprintParams) {
-                           $LimitedGraphParams += @{
-                               CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
-                               ClientID = $ServicePrincipalParams.CertThumbprintParams.AppID;
-                               TenantId  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization also works here
-                           }
+                       if ($ServicePrincipalParams) {
+                           $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams }
                        }
-                       switch ($M365Environment) {
-                           "gcchigh" {
-                               $LimitedGraphParams += @{'Environment' = "USGov";}
-                           }
-                           "dod" {
-                               $LimitedGraphParams += @{'Environment' = "USGovDoD";}
-                           }
-                       }
-                       Connect-MgGraph @LimitedGraphParams | Out-Null
+                       Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
                    }
                    if ($SPOAuthRequired) {
@@ -231,7 +222,7 @@ function Connect-Tenant {
            }
        }
        catch {
-           Write-Error "Error establishing a connection with $($Product). $($_)"
+           Write-Warning "Error establishing a connection with $($Product): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
            $ProdAuthFailed += $Product
            Write-Warning "$($Product) will be omitted from the output because of failed authentication"
        }
@@ -293,6 +284,9 @@ function Disconnect-SCuBATenant {
                Remove-PowerAppsAccount -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
            }
            elseif (($Product -eq "exo") -or ($Product -eq "defender")) {
+               if($Product -eq "defender") {
+                   Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
+               }
                Disconnect-ExchangeOnline -Confirm:$false -ErrorAction SilentlyContinue -InformationAction SilentlyContinue | Out-Null
            }
            else {
@@ -305,7 +299,7 @@ function Disconnect-SCuBATenant {
        # Suppress error due to disconnect from service with no active connection
        continue
    } catch {
-       Write-Error "ERRROR: Could not disconnect from $Product`n$($Error[0]): "
+       Write-Warning "Could not disconnect from $Product`n: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
    } finally {
        $ErrorActionPreference = "Continue"
    }

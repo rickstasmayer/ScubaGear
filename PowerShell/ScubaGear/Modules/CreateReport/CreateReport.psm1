@@ -1,8 +1,10 @@
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath "..\Utility")
+
 function New-Report {
      <#
     .Description
-    This function creates the individual HTML report using the TestResults.json.
-    Output will be stored as an HTML file in the InvidualReports folder in the OutPath Folder.
+    This function creates the individual HTML/json reports using the TestResults.json.
+    Output will be stored as HTML/json files in the InvidualReports folder in the OutPath Folder.
     The report Home page and link tree will be named BaselineReports.html
     .Functionality
     Internal
@@ -60,11 +62,11 @@ function New-Report {
 
     $ProductSecureBaseline = $SecureBaselines.$BaselineName
 
-    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
-    $SettingsExport =  Get-Content $FileName | ConvertFrom-Json
+    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json" -Resolve
+    $SettingsExport =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
-    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json"
-    $TestResults =  Get-Content $FileName | ConvertFrom-Json
+    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json" -Resolve
+    $TestResults =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
     $Fragments = @()
 
@@ -75,6 +77,12 @@ function New-Report {
         "Module Version" = $SettingsExport.module_version
     }
 
+    # Json version of the product-specific report
+    $ReportJson = @{
+        "MetaData" = $MetaData
+        "Results" = @()
+    };
+
     $MetaDataTable = $MetaData | ConvertTo-HTML -Fragment
     $MetaDataTable = $MetaDataTable -replace '^(.*?)<table>','<table id="tenant-data" style = "text-align:center;">'
     $Fragments += $MetaDataTable
@@ -82,6 +90,7 @@ function New-Report {
         "Warnings" = 0;
         "Failures" = 0;
         "Passes" = 0;
+        "Omits" = 0;
         "Manual" = 0;
         "Errors" = 0;
         "Date" = $SettingsExport.date;
@@ -95,14 +104,30 @@ function New-Report {
             $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
 
             if ($null -ne $Test){
-                $MissingCommands = @()
-
-                if ($SettingsExport."$($BaselineName)_successful_commands" -or $SettingsExport."$($BaselineName)_unsuccessful_commands") {
-                    # If neither of these keys are present, it means the provider for that baseline
-                    # hasn't been updated to the updated error handling method. This check
-                    # here ensures backwards compatibility until all providers are udpated.
-                    $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
+                # Check if the config file indicates the control should be omitted
+                $Config = $SettingsExport.scuba_config
+                $Omit = Get-OmissionState $Config $Control.Id
+                if ($Omit) {
+                    $ReportSummary.Omits += 1
+                    $OmitRationale = $Config.OmitPolicy.$($Control.Id).Rationale
+                    if ([string]::IsNullOrEmpty($OmitRationale)) {
+                        Write-Warning "Config file indicates omitting $($Control.Id), but no rationale provided."
+                        $OmitRationale = "Rationale not provided."
+                    }
+                    else {
+                        $OmitRationale = "`"$($OmitRationale)`""
+                    }
+                    $Fragment += [pscustomobject]@{
+                        "Control ID"=$Control.Id
+                        "Requirement"=$Control.Value
+                        "Result"= "Omitted"
+                        "Criticality"= $Test.Criticality
+                        "Details"= "Test omitted by user. $($OmitRationale)"
+                    }
+                    continue
                 }
+
+                $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
 
                 if ($MissingCommands.Count -gt 0) {
                     $Result = "Error"
@@ -165,18 +190,46 @@ function New-Report {
             }
         }
 
+        # Build the markdown links for each policy table, append as a child inside header tags
+        # Example: "AAD-1 Legacy Authentication"
         $Number = $BaselineName.ToUpper() + '-' + $BaselineGroup.GroupNumber
         $Name = $BaselineGroup.GroupName
         $GroupAnchor = New-MarkdownAnchor -GroupNumber $BaselineGroup.GroupNumber -GroupName $BaselineGroup.GroupName
-        $MarkdownLink = "<a class='control_group' href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/PowerShell/ScubaGear/baselines/$($BaselineName.ToLower()).md#$GroupAnchor`" target=`"_blank`">$Name</a>"
+        $GroupReferenceURL = "$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/PowerShell/ScubaGear/baselines/$($BaselineName.ToLower()).md$GroupAnchor"
+        $MarkdownLink = "<a class='control_group' href=`"$($GroupReferenceURL)`" target=`"_blank`">$Name</a>"
         $Fragments += $Fragment | ConvertTo-Html -PreContent "<h2>$Number $MarkdownLink</h2>" -Fragment
+
+        # Package Assessment Report into Report JSON by Policy Group
+        $ReportJson.Results += [pscustomobject]@{
+            GroupName = $BaselineGroup.GroupName;
+            GroupNumber = $BaselineGroup.GroupNumber;
+            GroupReferenceURL = $GroupReferenceURL;
+            Controls = $Fragment;
+        }
+
+        # Regex will filter out any <table> tags without an id attribute (replace new fragments only, not <table> tags which have already been modified)
+        $Fragments = $Fragments -replace ".*(<table(?![^>]+id)*>)", "<table class='policy-data' id='$Number'>"
     }
 
+    # Craft the json report
+    $ReportJson.ReportSummary = $ReportSummary
+    $JsonFileName = Join-Path -Path $IndividualReportPath -ChildPath "$($BaselineName)Report.json"
+    $ReportJson = ConvertTo-Json @($ReportJson) -Depth 5
+
+    # ConvertTo-Json for some reason converts the <, >, and ' characters into unicode escape sequences.
+    # Convert those back to ASCII.
+    $ReportJson = $ReportJson.replace("\u003c", "<")
+    $ReportJson = $ReportJson.replace("\u003e", ">")
+    $ReportJson = $ReportJson.replace("\u0027", "'")
+    $ReportJson | Out-File $JsonFileName
+
+    # Finish building the html report
     $Title = "$($FullName) Baseline Report"
-    $AADWarning = "<p> Note: Conditional Access (CA) Policy exclusions and additional policy conditions
-    may limit a policy's scope more narrowly than desired. Recommend reviewing matching policies
-    against the baseline statement to ensure a match between intent and implementation. </p>"
-    $NoWarning = "<p><br/></p>"
+    $AADWarning = "Exclusions must only be used if they are approved within an organization's security risk acceptance process.
+    Please reference <a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/docs/configuration/configuration.md#entra-id-configuration`" target=`"_blank`">this section in the README file</a>
+    file for a list of the policies that accept exclusions and the instructions for setting up exclusions in the configuration file.
+    <i>Exclusions can introduce grave risks to your system and must be managed carefully.</i>"
+    $NoWarning = "<br/>"
     Add-Type -AssemblyName System.Web
 
     $ReporterPath = $PSScriptRoot
@@ -188,13 +241,42 @@ function New-Report {
 
     # Handle AAD-specific reporting
     if ($BaselineName -eq "aad") {
+
+        # Load the CSV file
+        $csvPath = Join-Path -Path $PSScriptRoot -ChildPath "MicrosoftLicenseToProductNameMappings.csv"
+        $csvData = Import-Csv -Path $csvPath
+
+        $LicenseInfoArray = $SettingsExport.license_information | ForEach-Object {
+
+            $SkuID = $_.SkuId
+            # Find the corresponding product name
+            $matchingRow = $csvData | Where-Object { $_.GUID -eq $SkuID } | Select-Object -First 1
+            $productName = "Unknown SKU Name"
+            if ($matchingRow) {
+                $productName = $matchingRow.'Product_Display_Name'
+            }
+            # Create a custom object with relevant properties
+            [pscustomobject]@{
+                "Product Name" = $productName
+                "License SKU Identifier" = $_.SkuPartNumber
+                "Licenses in Use" = $_.ConsumedUnits
+                "Total Licenses" = $_.PrepaidUnits.Enabled
+            }
+        }
+        # Convert the custom objects to an HTML table
+        $LicenseTable = $LicenseInfoArray | ConvertTo-Html -As Table -Fragment
+        $LicenseTable = $LicenseTable -replace '^(.*?)<table>','<table id="license-info" style = "text-align:center;">'
+
+        # Create a section header for the licensing information
+        $LicensingHTML = "<h2>Tenant Licensing Information</h2>" + $LicenseTable
+
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)
-        $ReportHTML = $ReportHTML.Replace("{CAPTABLES}", "")
+        $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", $LicensingHTML)
         $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
     }
     else {
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $NoWarning)
-        $ReportHTML = $ReportHTML.Replace("{CAPTABLES}", "")
+        $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", "")
         $CapJson = "null"
     }
 
@@ -219,6 +301,72 @@ function New-Report {
     [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $FileName
 
     $ReportSummary
+}
+
+function Get-OmissionState {
+    <#
+    .Description
+    Determine if the supplied control was marked for omission in the config file.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject]
+        $Config,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ControlId
+    )
+    $Omit = $false
+    if ($Config.psobject.properties.name -Contains "OmitPolicy") {
+        if ($Config.OmitPolicy.psobject.properties.name -Contains $ControlId) {
+            # The config indicates the control should be omitted
+            if ($Config.OmitPolicy.$($ControlId).psobject.properties.name -Contains "Expiration") {
+                # An expiration date for the omission expiration was provided. Evaluate the date
+                # to see if the control should still be omitted.
+                if ($Config.OmitPolicy.$($ControlId).Expiration -eq "") {
+                    # If the Expiration date is an empty string, omit the policy
+                    $Omit = $true
+                }
+                else {
+                    # An expiration date was provided and it's not an empty string
+                    $Now = Get-Date
+                    $ExpirationString = $Config.OmitPolicy.$($ControlId).Expiration
+                    try {
+                        $ExpirationDate = Get-Date -Date $ExpirationString
+                        if ($ExpirationDate -lt $Now) {
+                            # The expiration date is passed, don't omit the policy
+                            $Warning = "Config file indicates omitting $($ControlId), but the provided "
+                            $Warning += "expiration date, $ExpirationString, has passed. Control will "
+                            $Warning += "not be omitted."
+                            Write-Warning $Warning
+                        }
+                        else {
+                            # The expiration date is in the future, omit the policy
+                            $Omit = $true
+                        }
+                    }
+                    catch {
+                        # Malformed date, don't omit the policy
+                        $Warning = "Config file indicates omitting $($ControlId), but the provided "
+                        $Warning += "expiration date, $ExpirationString, is malformed. The expected "
+                        $Warning += "format is yyyy-mm-dd. Control will not be omitted."
+                        Write-Warning $Warning
+                    }
+                }
+            }
+            else {
+                # The expiration date was not provided, omit the policy
+                $Omit = $true
+            }
+        }
+    }
+    $Omit
 }
 
 function Import-SecureBaseline{

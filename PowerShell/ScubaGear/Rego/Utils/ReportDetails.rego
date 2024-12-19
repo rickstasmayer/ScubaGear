@@ -1,6 +1,7 @@
 package utils.report
-import future.keywords
+import rego.v1
 import data.utils.key.PASS
+import data.utils.key.FAIL
 
 
 #############
@@ -11,6 +12,7 @@ default BASELINEVERSION := "main"
 
 BASELINEVERSION := input.module_version
 
+# regal ignore:line-length
 SCUBABASEURL := sprintf("https://github.com/cisagov/ScubaGear/blob/v%v/PowerShell/ScubaGear/baselines/", [BASELINEVERSION])
 
 ########################
@@ -29,7 +31,6 @@ PolicyLink(PolicyId) := sprintf(
     [SCUBABASEURL, PolicyProduct(PolicyId), PolicyAnchor(PolicyId)]
 )
 
-
 ###############################
 # Generic Reporting Functions #
 ###############################
@@ -43,16 +44,28 @@ NotCheckedDetails(PolicyId) := sprintf(
     [PolicyLink(PolicyId)]
 )
 
+# Use this when you need to make a policy not-implemented because of deprecation
+NotCheckedDeprecation :=
+    concat(" ", [
+    "This configuration setting has been deprecated and we are in the process of removing it from the baseline."
+    ])
+
+
+# Note: Reason must include %v to reference policy in document.
+CheckedSkippedDetails(PolicyId, Reason) := sprintf(
+    concat(" ", [Reason]), [PolicyLink(PolicyId)]
+)
+
 # 3rd Party Report Details method
 DefenderMirrorDetails(PolicyId) := sprintf(
     concat(" ", [
     "A custom product can be used to fulfill this policy requirement.",
-    "If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance.",
+    "If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance.",
     "If you are using Defender for Office 365 to implement this policy,",
-    "ensure that when running ScubaGear defender is in the ProductNames parameter.",
-    "Then, manually review the corresponding Defender for Office 365 policy that fulfills",
-    "the requirements of this policy.",
-    "See %v for instructions on manual check."
+    "ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter.",
+    "Then, review the corresponding Defender policy that fulfills",
+    "the requirements of this policy on the Defender ScubaGear HTML report.",
+    "See the %v for instructions on a manual check."
     ]),
     [PolicyLink(PolicyId)]
 )
@@ -62,19 +75,24 @@ ReportDetailsBoolean(true) := "Requirement met"
 
 ReportDetailsBoolean(false) := "Requirement not met"
 
-# Returns specified string if Status is false (good for error msg)
-ReportDetailsString(true, _) := PASS if {}
+# Reporting methods passed Status and appends warning
+ReportDetailsBooleanWarning(true, Warning) := concat(": ", [PASS, Warning])
 
-ReportDetailsString(false, String) := String if {}
+ReportDetailsBooleanWarning(false, Warning) := concat(": ", [FAIL, Warning])
+
+# Returns specified string if Status is false (good for error msg)
+ReportDetailsString(true, _) := PASS
+
+ReportDetailsString(false, String) := String
 
 # Returns string constructed from array if Status is false (good for error msg)
-ReportDetailsArray(true, _, _) := PASS if {}
+ReportDetailsArray(true, _, _) := PASS
 
 ReportDetailsArray(false, Array, String) := Description([
     ArraySizeStr(Array),
     String,
     concat(", ", Array)
-]) if {}
+])
 
 
 ################################################

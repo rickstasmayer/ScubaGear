@@ -3,17 +3,17 @@ $ModuleList = @(
     @{
         ModuleName = 'MicrosoftTeams'
         ModuleVersion = [version] '4.9.3'
-        MaximumVersion = [version] '5.99.99999'
+        MaximumVersion = [version] '6.99.99999'
     },
     @{
         ModuleName = 'ExchangeOnlineManagement' # includes Defender
         ModuleVersion = [version] '3.2.0'
-        MaximumVersion = [version] '3.99.99999'
+        MaximumVersion = [version] '3.4.99999'
     },
     @{
         ModuleName = 'Microsoft.Online.SharePoint.PowerShell' # includes OneDrive
         ModuleVersion = [version] '16.0.0'
-        MaximumVersion = [version] '16.99.99999'
+        MaximumVersion = [version] '16.0.24810.12000'
     },
     @{
         ModuleName = 'PnP.PowerShell' # alternate for SharePoint PowerShell
@@ -23,7 +23,7 @@ $ModuleList = @(
     @{
         ModuleName = 'Microsoft.PowerApps.Administration.PowerShell'
         ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.99.99999'
+        MaximumVersion = [version] '2.0.194'
     },
     @{
         ModuleName = 'Microsoft.PowerApps.PowerShell'
@@ -51,12 +51,12 @@ $ModuleList = @(
         MaximumVersion = [version] '2.99.99999'
     },
     @{
-        ModuleName = 'Microsoft.Graph.Beta.Identity.Governance'
+        ModuleName = 'Microsoft.Graph.Beta.Identity.SignIns'
         ModuleVersion = [version] '2.0.0'
         MaximumVersion = [version] '2.99.99999'
     },
     @{
-        ModuleName = 'Microsoft.Graph.Beta.Identity.SignIns'
+        ModuleName = 'Microsoft.Graph.Beta.DirectoryObjects'
         ModuleVersion = [version] '2.0.0'
         MaximumVersion = [version] '2.99.99999'
     },

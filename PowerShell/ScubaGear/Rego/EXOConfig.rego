@@ -1,6 +1,5 @@
 package exo
-import future.keywords
-import data.utils.report.NotCheckedDetails
+import rego.v1
 import data.utils.report.DefenderMirrorDetails
 import data.utils.report.ArraySizeStr
 import data.utils.report.ReportDetailsBoolean
@@ -51,22 +50,7 @@ tests contains {
 ############
 
 #
-# MS.EXO.2.1v1
-#--
-
-# At this time we are unable to test for approved IP addresses for sending mail
-tests contains {
-    "PolicyId": "MS.EXO.2.1v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.EXO.2.1v1"),
-    "RequirementMet": false
-}
-#--
-
-#
-# MS.EXO.2.2v1
+# MS.EXO.2.2v2
 #--
 
 # Loop through domain DNS responses & loop through the policies associated
@@ -74,12 +58,13 @@ tests contains {
 # records does not exist, save domain name in DomainsWithoutSpf array.
 DomainsWithoutSpf contains DNSResponse.domain if {
     some DNSResponse in input.spf_records
-    SpfRecords := {Record | some Record in DNSResponse.rdata; startswith(Record, "v=spf1 ")}
+    SpfRecords := {Record | some Record in DNSResponse.rdata; startswith(Record, "v=spf1 "); contains(Record, "-all")} | 
+        {Record | some Record in DNSResponse.rdata; startswith(Record, "v=spf1 "); contains(Record, "redirect")}
     count(SpfRecords) == 0
 }
 
 tests contains {
-    "PolicyId": "MS.EXO.2.2v1",
+    "PolicyId": "MS.EXO.2.2v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-ScubaSpfRecord", "Get-AcceptedDomain"],
     "ActualValue": Domains,
@@ -431,51 +416,80 @@ tests contains {
 ############
 
 #
-# MS.EXO.8.1v1
+# MS.EXO.8.1v2
 #--
 
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
-    "PolicyId": "MS.EXO.8.1v1",
+    "PolicyId": "MS.EXO.8.1v2",
     "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.EXO.8.1v1"),
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.8.1v2"),
     "RequirementMet": false
 }
 #--
 
 #
-# MS.EXO.8.2v1
+# MS.EXO.8.2v2
 #--
 
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
-    "PolicyId": "MS.EXO.8.2v1",
+    "PolicyId": "MS.EXO.8.2v2",
     "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.EXO.8.2v1"),
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.8.2v2"),
     "RequirementMet": false
 }
 #--
 
+#
+# MS.EXO.8.3v1
+#--
+
+# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
+tests contains {
+    "PolicyId": "MS.EXO.8.3v1",
+    "Criticality": "Should/3rd Party",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.8.3v1"),
+    "RequirementMet": false
+}
+#--
+
+#
+# MS.EXO.8.4v1
+#--
+
+# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
+tests contains {
+    "PolicyId": "MS.EXO.8.4v1",
+    "Criticality": "Shall/3rd Party",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.8.4v1"),
+    "RequirementMet": false
+}
+#--
 
 ############
 # MS.EXO.9 #
 ############
 
 #
-# MS.EXO.9.1v1
+# MS.EXO.9.1v2
 #--
 
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
-    "PolicyId": "MS.EXO.9.1v1",
+    "PolicyId": "MS.EXO.9.1v2",
     "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.EXO.9.1v1"),
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.9.1v2"),
     "RequirementMet": false
 }
 #--
@@ -496,16 +510,46 @@ tests contains {
 #--
 
 #
-# MS.EXO.9.3v1
+# MS.EXO.9.3v2
 #--
 
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
-    "PolicyId": "MS.EXO.9.3v1",
+    "PolicyId": "MS.EXO.9.3v2",
     "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.EXO.9.3v1"),
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.9.3v2"),
+    "RequirementMet": false
+}
+#--
+
+#
+# MS.EXO.9.4v1
+#--
+
+# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
+tests contains {
+    "PolicyId": "MS.EXO.9.4v1",
+    "Criticality": "Should/3rd Party",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.9.4v1"),
+    "RequirementMet": false
+}
+#--
+
+#
+# MS.EXO.9.5v1
+#--
+
+# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
+tests contains {
+    "PolicyId": "MS.EXO.9.5v1",
+    "Criticality": "Should/3rd Party",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.9.5v1"),
     "RequirementMet": false
 }
 #--
@@ -702,16 +746,16 @@ tests contains {
 #############
 
 #
-# MS.EXO.14.1v1
+# MS.EXO.14.1v2
 #--
 
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
-    "PolicyId": "MS.EXO.14.1v1",
+    "PolicyId": "MS.EXO.14.1v2",
     "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.EXO.14.1v1"),
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.14.1v2"),
     "RequirementMet": false
 }
 #--
@@ -746,6 +790,16 @@ tests contains {
 }
 #--
 
+# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
+tests contains {
+    "PolicyId": "MS.EXO.14.4v1",
+    "Criticality": "Should/3rd Party",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.14.4v1"),
+    "RequirementMet": false
+}
+#--
 
 #############
 # MS.EXO.15 #
